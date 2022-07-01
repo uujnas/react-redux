@@ -135,3 +135,13 @@ The `mapDispatchToProps()` function is used to provide specific action creators 
 Every time when state changes, log it.
 
       store.subscribe(()=> console.log('store updates', store.getState()))
+
+## What If we have multiple reducer.
+In order to let us combine multiple reducers together, Redux provides the `combineReducers() `method.
+
+        const rootReducer = combineReducer({
+          buyCake: CakeReducer,
+          iceCream: iceCreamReducer
+        })
+
+        const store = createStore(rootReducer)
