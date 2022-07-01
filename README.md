@@ -131,3 +131,8 @@ The `mapDispatchToProps()` function is used to provide specific action creators 
             </div>
           )
         }
+#### Listen to changes
+Every time when state changes, log it.
+
+      store.subscribe(()=> console.log('store updates', store.getState()))
+
