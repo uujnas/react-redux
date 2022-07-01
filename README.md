@@ -1,70 +1,134 @@
-# Getting Started with Create React App
+# React-Redux Setup
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Redux is a state management framework that can be used with a number of different web technologies, including React.
+We can integrate react with redux with `react-redux` library.
 
-## Available Scripts
+1. Install redux and react-redux library in the project
+`npm install redux react-redux`
 
-In the project directory, you can run:
+# Redux
 
-### `npm start`
+Redux has a single state object that's responsible for the entire state of your application. React has redux `store`. This means that any piece of your app you want to update state, it must go through Redux store.
+Redux is all about store, action and reducer.  Action is about what to do? Reducer is about how to do? store hold the state of application.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+i. Create Redux Store
+  Declare a variable store and assign it to createStore() method, passing in the reducer as an argument.
+   import { createStore } from "redux"
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+   const store = createStore(cakeReducer)
+<em> You may wonder what the cakeReducer here. i.e `reducer`. Well we will discuss later. First we will go for action. </em>
 
-### `npm test`
+ii. Redux action
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+  Action carry a type property that specify type of action that occured. 
 
-### `npm run build`
+  Let's dicuss action creator.
+   
+   Action creator is a function that literally creates an action object.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+    const  BUY_CAKE = "BUY CAKE"
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+    export const buyCake = () => {
+      return {
+        type: BUY_CAKE
+      }
+    }
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+  a. Dispatch an action event `store.dispatch(action)`
+    store.dispatch(buyCake()) 
 
-### `npm run eject`
+3. In Redux, Reducer is a function that consist of previousState  and action. The previousState return to a newState. `(previousState, action) => newState`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+    const BUY_CAKE = "BUY CAKE"
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+    const initialState = {
+      noOfCakes: 10
+    }
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+    const cakeReducer = (state = initialState, action) => {
+      switch(action.type){
+        case BUY_CAKE:
+          return {
+            ...state,
+            noOfCakes: state.noOfCakes - 1
+          }
+        default:
+          return state
+      }
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+    }
 
-## Learn More
+    export default cakeReducer
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+  The function uses a switch statement to determine which type of action you are dealing with. The application doesn't lose its current state.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+# Connect Redux to React
 
-### Code Splitting
+React Redux provide a small API with two key features: Provider and connect.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+1. `Provider` is a wrapper component from React Redux that wraps your React app. 
+Provider takes two props
+ i. the redux store
+ ii. child component of your app.
 
-### Analyzing the Bundle Size
+  import store from './redux/store';
+  import { Provider } from 'react-redux';
+  import CakeContainer from './components/CakeContainer';
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+  <Provider store = {store}>
+    <CakeContainer />  
+  </Provider>
 
-### Making a Progressive Web App
+2. Map State to Props and map Dispatch to props
+  Specifying what state and action you want. You accomplish this by creating two functions:
+  i. mapSateToProps()
+  ii. mapDispatchToProps()
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+mapStateToProps: Takes redux state as parameter and return object
 
-### Advanced Configuration
+  const mapStateToProps = state =>{  
+  return {
+    noOfCakes: state.noOfCakes
+  }
+}
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+mapDispatchToProps: It takes redux dispatch as a parameter and return an object as a function
+The `mapDispatchToProps()` function is used to provide specific action creators to your React components so they can dispatch actions against the Redux store.
 
-### Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+   const mapDispatchToProps = (dispatch) => { 
+    return {
+      buyCake: () => {
+        dispatch(buyCake())   //action creator....`disptach(action_creator)`. 
+      }
+    }
+  }
 
-### `npm run build` fails to minify
+3. Connect React Redux
+ import { connect } from 'react-redux'
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+ connect(mapStateToProps, mapDispatchToProps)(CakeContainer)
+
+4. Now we can easily access state and action as a props from local store.
+
+  function CakeContainer(props) {
+    return (
+      <div>
+        <h2>No of cakes { props.noOfCakes }</h2>
+        <button onClick = { props.buyCake } >BUY CAKE </button>
+      </div>
+    )
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
