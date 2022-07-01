@@ -135,4 +135,3 @@ The `mapDispatchToProps()` function is used to provide specific action creators 
 Every time when state changes, log it.
 
       store.subscribe(()=> console.log('store updates', store.getState()))
-
